@@ -1,0 +1,41 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+
+extensions:
+  health_check: {}
+
+exporters:
+  otlp:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: 0.0.0.0:9090
+    namespace: go-otlp-collector
+  # loki:
+  #   endpoint: loki:3100
+  otlphttp/logs:
+    endpoint: "http://loki:3100/otlp"
+    tls:
+      insecure: true
+  debug: {}
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp, debug]
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheus, debug]
+    logs:
+      receivers: [otlp]
+      exporters: [otlphttp/logs, debug]
