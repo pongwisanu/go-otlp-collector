@@ -71,4 +71,12 @@ services:
         EOF
         /run.sh
 
-
+  golang:
+    build: go
+    ports:
+      - 8000:8000
+    environment:
+      - OTLP_COLLECTOR_URL=otel-collector:4317
+      - OTLP_SERVICE_NAME=go-otlp-collector-service
+    depends_on:
+      - otel-collector
